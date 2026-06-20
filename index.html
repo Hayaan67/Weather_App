@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassy Weather App</title>
+    <style>
+        /* Base Styling & Background with Water Drops effect */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1f4068, #162447, #0f1a1c);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Pure CSS Water Drops */
+        .drop {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(2px);
+            border-radius: 50%;
+            box-shadow: inset 10px 10px 10px rgba(0,0,0,0.05),
+                        15px 25px 10px rgba(0,0,0,0.1),
+                        inset -10px -10px 10px rgba(255,255,255,0.4),
+                        inset 0 0 10px rgba(255,255,255,0.6);
+        }
+        .drop::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            width: 15px;
+            height: 15px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        .drop1 { width: 80px; height: 80px; top: 10%; left: 10%; }
+        .drop2 { width: 120px; height: 120px; bottom: 15%; right: 10%; }
+        .drop3 { width: 50px; height: 50px; bottom: 20%; left: 15%; }
+        .drop4 { width: 60px; height: 60px; top: 15%; right: 20%; }
+
+        /* Glassmorphism Container */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 30px;
+            color: #fff;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Search Section */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Weather Info Grid */
+        .weather-info {
+            display: none; /* Hidden by default until data loads */
+        }
+
+        .main-details {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 20px;
+        }
+
+        .city-name {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .temp {
+            font-size: 48px;
+            font-weight: 300;
+            margin: 10px 0;
+        }
+
+        .grid-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-card span {
+            display: block;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-card p {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="drop drop1"></div>
+    <div class="drop drop2"></div>
+    <div class="drop drop3"></div>
+    <div class="drop drop4"></div>
+
+    <div class="container">
+        <h1>SkyGlass Weather</h1>
+        
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Enter city name...">
+            <button onclick="getWeather()">Search</button>
+        </div>
+
+        <div class="error" id="errorMsg">City not found. Please try again.</div>
+
+        <div class="weather-info" id="weatherInfo">
+            <div class="main-details">
+                <div class="city-name" id="location">Delhi, IN</div>
+                <div class="temp" id="temperature">--°C</div>
+                <p id="currentTime">Time: --:--</p>
+            </div>
+
+            <div class="grid-info">
+                <div class="info-card">
+                    <span>Coordinates</span>
+                    <p id="coords">Lat: -- | Lon: --</p>
+                </div>
+                <div class="info-card">
+                    <span>Altitude</span>
+                    <p id="altitude">-- m</p>
+                </div>
+                <div class="info-card">
+                    <span>Humidity</span>
+                    <p id="humidity">--%</p>
+                </div>
+                <div class="info-card">
+                    <span>Wind Speed</span>
+                    <p id="wind">-- km/h</p>
+                </div>
+                <div class="info-card">
+                    <span>Precipitation</span>
+                    <p id="precipitation">-- mm</p>
+                </div>
+                <div class="info-card">
+                    <span>AQI (US Index)</span>
+                    <p id="aqi">--</p>
+                </div>
+                <div class="info-card">
+                    <span>Sunrise</span>
+                    <p id="sunrise">--:--</p>
+                </div>
+                <div class="info-card">
+                    <span>Sunset</span>
+                    <p id="sunset">--:--</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const cityInput = document.getElementById('cityInput').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const weatherInfo = document.getElementById('weatherInfo');
+
+            if (!cityInput) return;
+
+            // Reset UI
+            errorMsg.style.display = 'none';
+
+            try {
+                // Step 1: Geocoding API to get Lat, Lon, Country, and Timezone from City Name
+                const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityInput)}&count=1&language=en&format=json`;
+                const geoResponse = await fetch(geoUrl);
+                const geoData = await geoResponse.json();
+
+                if (!geoData.results || geoData.results.length === 0) {
+                    throw new Error("City not found");
+                }
+
+                const city = geoData.results[0];
+                const lat = city.latitude;
+                const lon = city.longitude;
+                const cityName = city.name;
+                const country = city.country || city.country_code;
+                const timezone = city.timezone;
+
+                // Step 2: Fetch Weather and Air Quality Data using coordinates
+                const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&daily=sunrise,sunset&timezone=${encodeURIComponent(timezone)}`;
+                const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`;
+
+                // Fetch both concurrently to speed it up
+                const [weatherRes, aqiRes] = await Promise.all([fetch(weatherUrl), fetch(aqiUrl)]);
+                const weatherData = await weatherRes.json();
+                const aqiData = await aqiRes.json();
+
+                // Step 3: Parse and Format Time
+                const localTimeStr = new Date().toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-index', hour: '2-digit', minute: '2-digit' });
+                
+                // Helper to format API time strings (YYYY-MM-DDTHH:MM) to just HH:MM
+                const formatSunTime = (timeStr) => {
+                    return timeStr ? timeStr.split('T')[1] : '--:--';
+                };
+
+                // Step 4: Inject data into DOM
+                document.getElementById('location').innerText = `${cityName}, ${country}`;
+                document.getElementById('temperature').innerText = `${Math.round(weatherData.current.temperature_2m)}°C`;
+                document.getElementById('currentTime').innerText = `Local Time: ${localTimeStr}`;
+                document.getElementById('coords').innerText = `Lat: ${lat.toFixed(2)} | Lon: ${lon.toFixed(2)}`;
+                document.getElementById('altitude').innerText = `${weatherData.elevation || 0} m`;
+                document.getElementById('humidity').innerText = `${weatherData.current.relative_humidity_2m}%`;
+                document.getElementById('wind').innerText = `${weatherData.current.wind_speed_10m} km/h`;
+                document.getElementById('precipitation').innerText = `${weatherData.current.precipitation} mm`;
+                document.getElementById('aqi').innerText = aqiData.current?.us_aqi || 'N/A';
+                document.getElementById('sunrise').innerText = formatSunTime(weatherData.daily.sunrise[0]);
+                document.getElementById('sunset').innerText = formatSunTime(weatherData.daily.sunset[0]);
+
+                // Reveal weather information
+                weatherInfo.style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                weatherInfo.style.display = 'none';
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // Allow pressing "Enter" key to search
+        document.getElementById('cityInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                getWeather();
+            }
+        });
+    </script>
+</body>
+</html>
