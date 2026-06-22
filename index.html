@@ -5,7 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glassy Weather App</title>
     <style>
-        /* Base Styling & Background with Water Drops effect */
+        /* Base Styling & Background with CSS Variables */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1f4068, #162447, #0f1a1c);
+            --container-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.25);
+            --text-color: #ffffff;
+            --text-shadow: rgba(0, 0, 0, 0.3);
+            --input-bg: rgba(255, 255, 255, 0.15);
+            --input-border: rgba(255, 255, 255, 0.2);
+            --input-focus-bg: rgba(255, 255, 255, 0.25);
+            --input-focus-border: rgba(255, 255, 255, 0.5);
+            --placeholder-color: rgba(255, 255, 255, 0.7);
+            --button-bg: rgba(255, 255, 255, 0.25);
+            --button-border: rgba(255, 255, 255, 0.3);
+            --button-hover-bg: rgba(255, 255, 255, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            
+            /* Drops styling */
+            --drop-bg: rgba(255, 255, 255, 0.1);
+            --drop-shadow-inset-1: rgba(0, 0, 0, 0.05);
+            --drop-shadow-inset-2: rgba(255, 255, 255, 0.4);
+            --drop-shadow-inset-3: rgba(255, 255, 255, 0.6);
+            --drop-shadow-out: rgba(0, 0, 0, 0.1);
+            --drop-highlight: #ffffff;
+            
+            --theme-icon-color: #ffffff;
+            --glass-blur: 15px;
+        }
+
+        /* Solarized Dark Theme */
+        body.solarized-dark {
+            --bg-gradient: linear-gradient(135deg, #002b36, #073642, #001e26);
+            --container-bg: rgba(7, 54, 66, 0.65);
+            --border-color: rgba(42, 161, 152, 0.35);
+            --text-color: #93a1a1;
+            --text-shadow: rgba(0, 0, 0, 0.5);
+            --input-bg: rgba(0, 43, 54, 0.4);
+            --input-border: rgba(42, 161, 152, 0.25);
+            --input-focus-bg: rgba(0, 43, 54, 0.55);
+            --input-focus-border: rgba(42, 161, 152, 0.6);
+            --placeholder-color: #586e75;
+            --button-bg: rgba(42, 161, 152, 0.25);
+            --button-border: rgba(42, 161, 152, 0.4);
+            --button-hover-bg: rgba(42, 161, 152, 0.4);
+            --card-bg: rgba(0, 43, 54, 0.25);
+            --card-border: rgba(42, 161, 152, 0.15);
+            --text-muted: #657b83;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            
+            /* Drops styling customized for Solarized */
+            --drop-bg: rgba(42, 161, 152, 0.08);
+            --drop-shadow-inset-1: rgba(0, 0, 0, 0.15);
+            --drop-shadow-inset-2: rgba(42, 161, 152, 0.3);
+            --drop-shadow-inset-3: rgba(42, 161, 152, 0.4);
+            --drop-shadow-out: rgba(0, 0, 0, 0.2);
+            --drop-highlight: #93a1a1;
+            
+            --theme-icon-color: #2aa198;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,25 +77,27 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #1f4068, #162447, #0f1a1c);
+            background: var(--bg-gradient);
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
             overflow-x: hidden;
             position: relative;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
         /* Pure CSS Water Drops */
         .drop {
             position: absolute;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--drop-bg);
             backdrop-filter: blur(2px);
             border-radius: 50%;
-            box-shadow: inset 10px 10px 10px rgba(0,0,0,0.05),
-                        15px 25px 10px rgba(0,0,0,0.1),
-                        inset -10px -10px 10px rgba(255,255,255,0.4),
-                        inset 0 0 10px rgba(255,255,255,0.6);
+            box-shadow: inset 10px 10px 10px var(--drop-shadow-inset-1),
+                        15px 25px 10px var(--drop-shadow-out),
+                        inset -10px -10px 10px var(--drop-shadow-inset-2),
+                        inset 0 0 10px var(--drop-shadow-inset-3);
+            transition: all 0.5s ease;
         }
         .drop::before {
             content: '';
@@ -42,9 +106,10 @@
             left: 12px;
             width: 15px;
             height: 15px;
-            background: #fff;
+            background: var(--drop-highlight);
             border-radius: 50%;
             opacity: 0.7;
+            transition: all 0.5s ease;
         }
         .drop1 { width: 80px; height: 80px; top: 10%; left: 10%; }
         .drop2 { width: 120px; height: 120px; bottom: 15%; right: 10%; }
@@ -55,15 +120,17 @@
         .container {
             width: 100%;
             max-width: 600px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: var(--container-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 30px;
-            color: #fff;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            color: var(--text-color);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
             z-index: 10;
+            position: relative;
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
         }
 
         h1 {
@@ -71,7 +138,50 @@
             margin-bottom: 25px;
             font-weight: 400;
             letter-spacing: 2px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px var(--text-shadow);
+            color: var(--text-color);
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+        }
+
+        /* Theme Toggle Styling */
+        .theme-toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .theme-toggle-btn {
+            background: var(--button-bg);
+            border: 1px solid var(--button-border);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle-btn:active {
+            transform: translateY(0);
+        }
+
+        .theme-toggle-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--theme-icon-color);
+            transition: transform 0.5s ease, fill 0.5s ease;
         }
 
         /* Search Section */
@@ -84,37 +194,38 @@
         input {
             flex: 1;
             padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
             border-radius: 30px;
-            color: #fff;
+            color: var(--text-color);
             font-size: 16px;
             outline: none;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
         input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--placeholder-color);
+            transition: color 0.5s ease;
         }
 
         input:focus {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.5);
+            background: var(--input-focus-bg);
+            border-color: var(--input-focus-border);
         }
 
         button {
             padding: 12px 25px;
-            background: rgba(255, 255, 255, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: var(--button-bg);
+            border: 1px solid var(--button-border);
             border-radius: 30px;
-            color: #fff;
+            color: var(--text-color);
             cursor: pointer;
             font-weight: 600;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: var(--button-hover-bg);
             transform: translateY(-2px);
         }
 
@@ -126,8 +237,9 @@
         .main-details {
             text-align: center;
             margin-bottom: 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
+            border-bottom: 1px solid var(--card-border);
             padding-bottom: 20px;
+            transition: border-bottom 0.5s ease;
         }
 
         .city-name {
@@ -148,24 +260,28 @@
         }
 
         .info-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--card-bg);
             padding: 15px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
+            transition: all 0.5s ease;
         }
 
         .info-card span {
             display: block;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
             margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            transition: color 0.5s ease;
         }
 
         .info-card p {
             font-size: 16px;
             font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.5s ease;
         }
 
         .error {
@@ -177,6 +293,13 @@
     </style>
 </head>
 <body>
+    <script>
+        // Inline check to prevent theme flash
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'solarized-dark') {
+            document.body.classList.add('solarized-dark');
+        }
+    </script>
 
     <div class="drop drop1"></div>
     <div class="drop drop2"></div>
@@ -184,6 +307,14 @@
     <div class="drop drop4"></div>
 
     <div class="container">
+        <div class="theme-toggle-container">
+            <button id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle between Dark and Solarized Dark mode">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+                </svg>
+                <span>Dark Mode</span>
+            </button>
+        </div>
         <h1>SkyGlass Weather</h1>
         
         <div class="search-box">
@@ -238,6 +369,42 @@
     </div>
 
     <script>
+        // Initialize theme UI state
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            updateThemeButton(savedTheme === 'solarized-dark');
+        });
+
+        function toggleTheme() {
+            const isSolarized = document.body.classList.toggle('solarized-dark');
+            const newTheme = isSolarized ? 'solarized-dark' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(isSolarized);
+        }
+
+        function updateThemeButton(isSolarized) {
+            const btn = document.getElementById('themeToggleBtn');
+            if (!btn) return;
+            
+            if (isSolarized) {
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 14a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zM5.22 6.64a1 1 0 0 1 0-1.41l1.41-1.41a1 1 0 0 1 1.41 0 1 1 0 0 1 0 1.41L6.64 6.64a1 1 0 0 1-1.41 0zm10.6 10.6a1 1 0 0 1 0-1.41l1.41-1.41a1 1 0 0 1 1.41 0 1 1 0 0 1 0 1.41l-1.41 1.41a1 1 0 0 1-1.41 0zM2 12a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1zm14 0a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2h-2a1 1 0 0 1-1-1zM6.64 18.78a1 1 0 0 1-1.41 0l-1.41-1.41a1 1 0 0 1 0-1.41 1 1 0 0 1 1.41 0l1.41 1.41a1 1 0 0 1 0 1.41zm10.6-10.6a1 1 0 0 1-1.41 0 1 1 0 0 1 0-1.41l1.41-1.41a1 1 0 0 1 1.41 0 1 1 0 0 1 0 1.41l-1.41 1.41z"/>
+                    </svg>
+                    <span>Solarized Dark</span>
+                `;
+                btn.title = "Switch to Dark Mode";
+            } else {
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+                    </svg>
+                    <span>Dark Mode</span>
+                `;
+                btn.title = "Switch to Solarized Dark Mode";
+            }
+        }
+
         async function getWeather() {
             const cityInput = document.getElementById('cityInput').value;
             const errorMsg = document.getElementById('errorMsg');
@@ -274,8 +441,8 @@
                 const weatherData = await weatherRes.json();
                 const aqiData = await aqiRes.json();
 
-                // Step 3: Parse and Format Time
-                const localTimeStr = new Date().toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-index', hour: '2-digit', minute: '2-digit' });
+                // Step 3: Parse and Format Time - fixed typo with hour property definition
+                const localTimeStr = new Date().toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', minute: '2-digit' });
                 
                 // Helper to format API time strings (YYYY-MM-DDTHH:MM) to just HH:MM
                 const formatSunTime = (timeStr) => {
